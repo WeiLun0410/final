@@ -1,0 +1,25 @@
+import java.time.LocalDate;
+import java.util.Iterator;
+
+public interface Purchasable {
+    default void AddPurchaseOrder(PurchaseOrder po){
+        LocalDate currentdate = LocalDate.now();
+        FileHandling poFile = new FileHandling("PurchaseOrder.txt");
+        Iterator iterator = po.getPrArrayList().iterator();
+
+        while (iterator.hasNext()){
+            PurchaseRequisition pr = (PurchaseRequisition) iterator.next();
+            poFile.addRow(po.getPurchaseOrderID(),pr.getPurchaseRequisitionID(),po.getUser().getUserID(),pr.getItem().getItemID(),String.valueOf(pr.getQuantity()), String.valueOf(currentdate));
+        }
+    }
+
+    default  void DeletePurchaseOrder(PurchaseOrder po){
+        FileHandling poFile = new FileHandling("PurchaseOrder.txt");
+        poFile.deleteRow("purchaseOrderID",po.getPurchaseOrderID());
+    }
+
+    default  void EditPurchaseOrder(PurchaseOrder po,PurchaseRequisition pr,String editCol,String newContent){
+        FileHandling poFile = new FileHandling("PurchaseOrder.txt");
+        poFile.editRow("purchaseOrderID",po.getPurchaseOrderID(),"purchaseRequisitionID",pr.getPurchaseRequisitionID(),editCol,newContent);
+    }
+}
