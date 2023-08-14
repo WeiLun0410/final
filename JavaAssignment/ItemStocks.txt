@@ -1,2 +1,0 @@
-itemID,itemName,price,quantity,expireDate,supplierID
-Item002,Papaya,60,50,2020/10/28,S002
