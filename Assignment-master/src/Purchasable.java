@@ -56,12 +56,14 @@ public interface Purchasable {
     default void EditPurchaseOrder(String poID,String prID,String itemID, String editCol, String newContent) {
         FileHandling poFile = new FileHandling("PurchaseOrder.txt");
         FileHandling prFile = new FileHandling("PurchaseRequisition.txt");
+
         if (editCol.equalsIgnoreCase("purchaseRequisitionID")) {
             String salesManagerID = poFile.searchRow("purchaseOrderID", poID).split(",")[3];
             String quantity = poFile.searchRow("purchaseOrderID", poID).split(",")[4];
         }
         poFile.editRow("purchaseOrderID", poID,"purchaseRequisitionID",prID,"itemID", itemID,editCol, newContent);
         System.out.println("Purchase Order Edited Successfully");
+
     }
 
 }

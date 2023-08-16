@@ -668,7 +668,7 @@ public class ConsoleTextDisplay {
             if (purchaseRequisitionID.equalsIgnoreCase("done"))
                 break;
             if (prArrayList.contains(PurchaseRequisition.createPr(purchaseRequisitionID))) {
-                System.out.println("This Item Has Been Added");
+                System.out.println("This Purchase Requisition Has Been Added");
                 continue;
             } else if (purchaseRequisitionFile.searchRow("purchaseRequisitionID", purchaseRequisitionID) == null) {
                 System.out.println("Purchase Requisition ID Not Found");
@@ -699,6 +699,7 @@ public class ConsoleTextDisplay {
                 }
                 break;
             }
+            System.out.println("PurchaseOrder Deleted Successfully");
             return poID;
         } else {
             return null;
@@ -707,23 +708,39 @@ public class ConsoleTextDisplay {
 
     public static ArrayList<String> editPoMenu() {
         FileHandling poFile = new FileHandling("PurchaseOrder.txt");
+        FileHandling prFile = new FileHandling("PurchaseRequisition.txt");
         String newContent, poID,prID,itemID;
         poFile.printData();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("Enter Purchase Order ID : ");
             poID = scanner.next();
-            System.out.print("Enter PurchaseRequisitionID : ");
-            prID = scanner.next();
-            System.out.print("Enter itemID : ");
-            itemID = scanner.next();
             if (poFile.searchRow("purchaseOrderID", poID) == null) {
                 System.out.println("Purchase Order Not Found");
+                continue;
+            }
+            break;
+        }
+        while (true) {
+            System.out.print("Enter PurchaseRequisitionID : ");
+            prID = scanner.next();
+            if (!poFile.searchMultipleRow("purchaseOrderID",poID,"purchaseRequisitionID").contains(prID)) {
+                System.out.println("PurchaseRequisitionID Not Found");
                 continue;
             }
 
             break;
         }
+        while (true) {
+            System.out.print("Enter itemID : ");
+            itemID = scanner.next();
+            if (!poFile.searchMultipleRow("purchaseOrderID",poID,"itemID").contains(itemID)) {
+                System.out.println("itemID Not Found");
+                continue;
+            }
+            break;
+        }
+
         System.out.println("What kind of information you want to edit ? ");
         System.out.print("""
                 1. Purchase Requisition ID
@@ -733,7 +750,6 @@ public class ConsoleTextDisplay {
         String editCol;
         scanner.nextLine();
         if (choice == 1) {
-            FileHandling prFile = new FileHandling("PurchaseRequisition.txt");
             prFile.printData();
             editCol = "purchaseRequisitionID";
             while (true) {
@@ -745,6 +761,8 @@ public class ConsoleTextDisplay {
                 }
                 break;
             }
+            String[] line =  poFile.searchRow("purchaseRequisitionID","itemID",prID,itemID).split(",");
+            prFile.addRow(prID,line[3],line[4],line[5],line[7]);
         } else {
             editCol = "quantity";
             System.out.print("Please Enter The New Quantity : ");
@@ -758,6 +776,7 @@ public class ConsoleTextDisplay {
         editDetail.add(itemID);
         editDetail.add(editCol);
         editDetail.add(newContent);
+        System.out.println("PurchaseOrder Edited Successfully");
         return editDetail;
     }
 }
