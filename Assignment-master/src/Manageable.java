@@ -115,10 +115,15 @@ public interface Manageable {
         }
     }
 
-
     default void AddPurchaseRequisition(PurchaseRequisition pr) {
         FileHandling prFile = new FileHandling("PurchaseRequisition.txt");
-        prFile.addRow(pr.getPurchaseRequisitionID(), pr.getUserID(), pr.getItem().getItemID(), String.valueOf(pr.getQuantity()), pr.getRequestDate());
+        Iterator<Item> iterator  = pr.getItemList().iterator();
+        Iterator<String> iterator2 = pr.getQuantity().iterator();
+        while(iterator.hasNext() && iterator2.hasNext()){
+            Item prItem = iterator.next();
+            String quantity = iterator2.next();
+            prFile.addRow(pr.getPurchaseRequisitionID(), pr.getUserID(), prItem.getItemID(),quantity, pr.getRequestDate());
+        }
     }
 
     default void DeletePurchaseRequisition(String prID) {
@@ -126,9 +131,9 @@ public interface Manageable {
         prFile.deleteRow("purchaseRequisitionID", prID);
     }
 
-    default void EditPurchaseRequisition(String prID, String editCol, String newContent) {
+    default void EditPurchaseRequisition(String prID,String itemID, String editCol, String newContent) {
         FileHandling prFile = new FileHandling("PurchaseRequisition.txt");
-        prFile.editRow("purchaseRequisitionID", prID, editCol, newContent);
+        prFile.editRow("purchaseRequisitionID", prID,"itemID",itemID, editCol, newContent);
     }
 
 }

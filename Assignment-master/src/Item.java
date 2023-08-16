@@ -32,6 +32,7 @@ public class Item {
         return supplyPrice;
     }
 
+
     public Item(String itemID, String itemName, int quantity, String expireDate, double sellPrice, double supplyPrice) {
         this.itemID = itemID;
         this.itemName = itemName;

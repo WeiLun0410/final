@@ -69,16 +69,13 @@ public class Main {
                                         salesManager.EditDailyItemSales((Item) editDetail.get(0), (String) editDetail.get(1), (String) editDetail.get(2), (String) editDetail.get(3));
                                     }
                                     case 10 -> {
-                                        ArrayList<Object> addPrArrayList = ConsoleTextDisplay.AddPrMenu(salesManager);
-                                        if (addPrArrayList.get(0).toString().equals("1")) { // - Confirm Add Requisition
-                                            salesManager.AddPurchaseRequisition((PurchaseRequisition) addPrArrayList.get(1));
-                                        }
+                                            salesManager.AddPurchaseRequisition(ConsoleTextDisplay.AddPrMenu(salesManager));
                                     }
                                     case 11 ->
                                             salesManager.DeletePurchaseRequisition(ConsoleTextDisplay.deletePrMenu());
                                     case 12 -> {
                                         ArrayList<String> editDetail = ConsoleTextDisplay.editPrMenu(salesManager);
-                                        salesManager.EditPurchaseRequisition(editDetail.get(0), editDetail.get(1), editDetail.get(2));
+                                        salesManager.EditPurchaseRequisition(editDetail.get(0), editDetail.get(1), editDetail.get(2),editDetail.get(3));
                                     }
                                     case 13 -> salesManager.displayPersonalRequisition();
                                     case 14 -> User.displayPurchaseOrder();
@@ -87,7 +84,7 @@ public class Main {
                                     }
                                 }
                             }
-                        } else if (user instanceof PurchaseManager purchaseManager) {
+                        } else if (user instanceof PurchaseManager  purchaseManager) {
                             attempt = 0;
                             boolean isLogout = false;
                             while (!isLogout) {
@@ -102,7 +99,7 @@ public class Main {
                                             purchaseManager.DeletePurchaseOrder(ConsoleTextDisplay.deletePurchaseOder());
                                     case 6 -> {
                                         ArrayList<String> editDetail = ConsoleTextDisplay.editPoMenu();
-                                        purchaseManager.EditPurchaseOrder(editDetail.get(0), editDetail.get(1), editDetail.get(2));
+                                        purchaseManager.EditPurchaseOrder(editDetail.get(0), editDetail.get(1), editDetail.get(2),editDetail.get(3),editDetail.get(4));
                                     }
                                     case 7 -> User.displayPurchaseOrder();
                                     case 8 -> isLogout = true;

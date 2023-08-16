@@ -139,7 +139,7 @@ public class ConsoleTextDisplay {
     public static String[] EditItemSubMenu() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("What kind of information you want to modify ?");
-        System.out.print(""" 
+        System.out.print("""
                 1. Item Name
                 2. Quantity
                 3. Expire Date
@@ -271,7 +271,7 @@ public class ConsoleTextDisplay {
         }
         input.nextLine();
         System.out.println("What kind of information you want to edit?");
-        System.out.print(""" 
+        System.out.print("""
                 1. Supplier Name
                 2. Location
                 3. ItemID
@@ -434,7 +434,7 @@ public class ConsoleTextDisplay {
         editDetail.add(Item.createItem(itemID));
 
         System.out.println("What kind of information you want to edit?");
-        System.out.print(""" 
+        System.out.print("""
                 1. Sales Item
                 2. Quantity
                 3. Date
@@ -474,53 +474,68 @@ public class ConsoleTextDisplay {
         return editDetail;
     }
 
-    public static ArrayList<Object> AddPrMenu(SalesManager salesManager) {
-        String itemID;
+    public static PurchaseRequisition AddPrMenu(SalesManager salesManager) {
         Scanner scanner = new Scanner(System.in);
-        FileHandling f = new FileHandling("PurchaseRequisition.txt");
+        FileHandling prFile = new FileHandling("PurchaseRequisition.txt");
+        ArrayList<Item> itemArrayList = new ArrayList<>();
+        ArrayList<String> quantityArrayList = new ArrayList<>();
         printHeadingInConsole("Purchase Order Management System (POM)", 80);
-        String purchaseRequisitionID = """
-                                               Enter item detail below:
-                                               1. PurchaseRequisitionIDID:\s""" + f.generateID();
-        System.out.println(purchaseRequisitionID);
-        System.out.println("2. UserID: " + salesManager.getUserID());
-        FileHandling itemFiles = new FileHandling("Item.txt");
+        String prID = """
+                                    Enter Purchase Requisition detail below:
+                                    1. PurchaseRequisitionID :\s""" + prFile.generateID();
+        System.out.println(prID);
+        System.out.println("UserID: " + salesManager.getUserID());
+        int count = 0;
+        String itemID;
+        String quantity;
+        LocalDate currentDate = LocalDate.now();
+        FileHandling fh = new FileHandling("Item.txt");
+        fh.printData();
         while (true) {
-            itemFiles.printData();
-            System.out.print("3. itemID: ");
-            itemID = scanner.next();
-            if (itemFiles.searchRow("itemID", itemID) == null) {
-                System.out.println("Item Not Found");
-                continue;
+//            - First round Cannot done
+            if (count == 0) {
+                System.out.print("Please Enter the itemID: ");
+                itemID = scanner.next();
+                Item item = Item.createItem(itemID);
+                if (item == null) {
+                    System.out.println("Item ID Not Found");
+                    continue;
+                }
+                System.out.print("Enter item's quantity: ");
+                itemArrayList.add(item);
+                quantity =  String.valueOf(InputValidation.getInteger(1,99999));
+                quantityArrayList.add(quantity);
+                count++;
+            } else {
+                System.out.print("Please Enter the itemID (type 'done' to finish adding items) : ");
+                itemID = scanner.next();
+                boolean added = false;
+                for (Item item : itemArrayList) {
+                    if (item.getItemID().equals(itemID)) {
+                        System.out.println("This item has been added");
+                        added = true;
+                    }
+                }
+                if (added) continue;
+                if (itemID.equalsIgnoreCase("done")) {
+                    break;
+                } else {
+                    Item item = Item.createItem(itemID);
+                    if (item == null) {
+                        System.out.println("Item ID Not Found");
+                        continue;
+                    }
+                    System.out.println("Enter quantity: ");
+                    quantity =  String.valueOf(InputValidation.getInteger(1,99999));
+                    itemArrayList.add(item);
+                    quantityArrayList.add(quantity);
+                }
             }
-            break;
         }
-        System.out.print("4. Quantity: ");
-        int quantity = InputValidation.getInteger(1, 9999999);
-        System.out.print("5. RequestDate: ");
-        String requestDate = InputValidation.getValidDate();
-        System.out.println();
-        printHeadingInConsole("Purchase Order Management System (POM)", 80);
-        System.out.println("Confirm purchaseRequisition detail is correct");
-        System.out.println();
-        System.out.println("PurchaseRequisitionID : " + f.generateID());
-        System.out.println("UserID : " + salesManager.getUserID());
-        System.out.println("ItemID : " + itemID);
-        System.out.println("Quantity : " + quantity);
-        System.out.println("Request Date : " + requestDate);
+        return new PurchaseRequisition(prFile.generateID(), salesManager.getUserID(),itemArrayList,quantityArrayList,String.valueOf(currentDate));
 
-        System.out.println("=".repeat(80));
-        System.out.println("1. Confirm");
-        System.out.println("2. Discard Change");
-        System.out.print("Please enter your choice : ");
-        String choice = Integer.toString(InputValidation.getInteger(1, 2));
-        ArrayList<Object> objects = new ArrayList<>();
-        objects.add(choice);
-        PurchaseRequisition purchaseRequisition = new PurchaseRequisition(f.generateID(), salesManager.getUserID(), Item.createItem(itemID), quantity, requestDate);
-        objects.add(purchaseRequisition);
-        System.out.println("Purchase Requisition Added Successfully");
-        return objects;
     }
+
 
     public static String deletePrMenu() {
         FileHandling purchaseRequisitionFile = new FileHandling("PurchaseRequisition.txt");
@@ -541,7 +556,7 @@ public class ConsoleTextDisplay {
     }
 
     public static ArrayList<String> editPrMenu(SalesManager salesManager) {
-        String prID, newContent;
+        String prID, itemID = null,newContent;//
         FileHandling prFile = new FileHandling("PurchaseRequisition.txt");
         prFile.printData("userID", salesManager.getUserID());
         Scanner scanner = new Scanner(System.in);
@@ -554,11 +569,24 @@ public class ConsoleTextDisplay {
             if (!availableID.contains(prID)) {
                 System.out.println("Purchase Requisition ID Not Found");
                 continue;
+            }else{
+                while (true){
+                    salesManager.displayPersonalRequisition();
+                    System.out.println("Enter itemID :");//
+                    itemID = scanner.nextLine();
+
+                    if(prFile.searchRow("purchaseRequisitionID","itemID",prID,itemID) == null){
+                        System.out.println("Item not found,please enter available itemID");
+                    }else{
+                        break;
+                    }
+                }
+                
             }
             break;
         }
         System.out.println("What kind of information you want to edit ? ");
-        System.out.print(""" 
+        System.out.print("""
                 1. ItemID
                 2. Quantity
                 Please enter your choice :\s""");
@@ -590,6 +618,7 @@ public class ConsoleTextDisplay {
         }
         ArrayList<String> editDetail = new ArrayList<>();
         editDetail.add(prID);
+        editDetail.add(itemID);
         editDetail.add(editCol);
         editDetail.add(newContent);
         System.out.println("Purchase Requisition Edited Successfully");
@@ -633,20 +662,20 @@ public class ConsoleTextDisplay {
             prArrayList.add(PurchaseRequisition.createPr(purchaseRequisitionID));
             break;
         }
-//        while (true) {
-//            System.out.print("Purchase Requisition ID (Type \"Done\" to finish adding): ");
-//            purchaseRequisitionID = scanner.next();
-//            if (purchaseRequisitionID.equalsIgnoreCase("done"))
-//                break;
-//            if (prArrayList.contains(PurchaseRequisition.createPr(purchaseRequisitionID))) {
-//                System.out.println("This Item Has Been Added");
-//                continue;
-//            } else if (purchaseRequisitionFile.searchRow("purchaseRequisitionID", purchaseRequisitionID) == null) {
-//                System.out.println("Purchase Requisition ID Not Found");
-//                continue;
-//            }
-//            prArrayList.add(PurchaseRequisition.createPr(purchaseRequisitionID));
-//        }
+        while (true) {
+            System.out.print("Purchase Requisition ID (Type \"Done\" to finish adding): ");
+            purchaseRequisitionID = scanner.next();
+            if (purchaseRequisitionID.equalsIgnoreCase("done"))
+                break;
+            if (prArrayList.contains(PurchaseRequisition.createPr(purchaseRequisitionID))) {
+                System.out.println("This Item Has Been Added");
+                continue;
+            } else if (purchaseRequisitionFile.searchRow("purchaseRequisitionID", purchaseRequisitionID) == null) {
+                System.out.println("Purchase Requisition ID Not Found");
+                continue;
+            }
+            prArrayList.add(PurchaseRequisition.createPr(purchaseRequisitionID));
+        }
         LocalDate currentDate = LocalDate.now();
         PurchaseOrder po = new PurchaseOrder(poID, prArrayList, purchaseManager, String.valueOf(currentDate));
         System.out.println("Purchase Order Added Successfully");
@@ -678,20 +707,25 @@ public class ConsoleTextDisplay {
 
     public static ArrayList<String> editPoMenu() {
         FileHandling poFile = new FileHandling("PurchaseOrder.txt");
-        String newContent, poID;
+        String newContent, poID,prID,itemID;
         poFile.printData();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("Enter Purchase Order ID : ");
             poID = scanner.next();
+            System.out.print("Enter PurchaseRequisitionID : ");
+            prID = scanner.next();
+            System.out.print("Enter itemID : ");
+            itemID = scanner.next();
             if (poFile.searchRow("purchaseOrderID", poID) == null) {
                 System.out.println("Purchase Order Not Found");
                 continue;
             }
+
             break;
         }
         System.out.println("What kind of information you want to edit ? ");
-        System.out.print(""" 
+        System.out.print("""
                 1. Purchase Requisition ID
                 2. Quantity
                 Please enter your choice :\s""");
@@ -720,6 +754,8 @@ public class ConsoleTextDisplay {
         }
         ArrayList<String> editDetail = new ArrayList<>();
         editDetail.add(poID);
+        editDetail.add(prID);
+        editDetail.add(itemID);
         editDetail.add(editCol);
         editDetail.add(newContent);
         return editDetail;

@@ -64,22 +64,22 @@ public class Admin extends User implements Serializable,Purchasable,Manageable {
         }
     }
 
-//    public static User printData() {
-//        try {
-//            FileInputStream fis = new FileInputStream("Users.ser");
-//            ObjectInputStream ois = new ObjectInputStream(fis);
-//            while (true) {
-//                User temp;
-//                Object obj = ois.readObject();
-//                if (obj != null) {
-//                    temp = (User) obj;
-//                    System.out.println(temp);
-//                } else {
-//                    return null;
-//                }
-//            }
-//        } catch (IOException | ClassNotFoundException e) {
-//            return null;
-//        }
-//    }
+    public static User printData() {
+        try {
+            FileInputStream fis = new FileInputStream("Users.ser");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            while (true) {
+                User temp;
+                Object obj = ois.readObject();
+                if (obj != null) {
+                    temp = (User) obj;
+                    System.out.println(temp);
+                } else {
+                    return null;
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
+    }
 }

@@ -224,6 +224,47 @@ public class FileHandling implements Serializable {
     }
 
 
+    public void editRow(String colName1, String data1, String colName2, String data2,String colName3,String data3, String editCol, String overrideContent) {
+        try {
+            boolean found = false;
+            int colIndex1 = getHeader().indexOf(colName1);
+            int colIndex2 = getHeader().indexOf(colName2);
+            int colIndex3 = getHeader().indexOf(colName3);
+            FileReader fr = new FileReader(fileName);
+            int editCoIndex = getHeader().indexOf(editCol);
+            BufferedReader br = new BufferedReader(fr);
+
+            //            - Temp File writer
+            File tempFile = new File("Temp.txt");
+            FileWriter fw = new FileWriter(tempFile);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter pw = new PrintWriter(bw);
+
+            String currentLine;  // Jump the header line
+            String[] tempArr;
+            while ((currentLine = br.readLine()) != null) {
+                tempArr = currentLine.split(",");
+                if (tempArr[colIndex1].equals(data1) && tempArr[colIndex2].equals(data2) && tempArr[colIndex3].equals((data3))) {
+                    tempArr[editCoIndex] = overrideContent;
+                    currentLine = String.join(",", tempArr);
+                    found = true;
+                }
+                pw.println(currentLine);
+            }
+            br.close();
+            pw.close();
+            if (found) {
+                file.delete();
+                tempFile.renameTo(new File(fileName));
+            } else {
+                tempFile.delete();
+            }
+        } catch (IOException e) {
+            System.out.println("Error occurred while editing row");
+        }
+    }
+
+
     public void deleteRow(String colName, String data) {
         try {
             int colIndex = getHeader().indexOf(colName);
@@ -547,22 +588,4 @@ public class FileHandling implements Serializable {
         }
         return prefix;
     }
-
-    // Define the regular expression pattern to find the prefix
-//    private static String findPrefix(String line) {
-//
-//        String regexPattern = "^(S|SM|I|PR|PO)\\d{3}$\n";
-//
-//        // Find the first occurrence of the pattern using regex
-//        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regexPattern);
-//        java.util.regex.Matcher matcher = pattern.matcher(line);
-//
-//        // Extract and return the matched prefix
-//        if (matcher.find()) {
-//            return matcher.group();
-//        }
-//
-//        // Return an empty string if no match is found (or handle as appropriate)
-//        return "";
-//    }
 }
